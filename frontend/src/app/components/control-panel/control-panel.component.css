@@ -1,0 +1,32 @@
+.panel {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+button {
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #ffffff;
+  height: 32px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+label {
+  display: block;
+  font-size: 14px;
+}
+
+input[type='range'] {
+  width: 100%;
+}

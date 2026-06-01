@@ -1,0 +1,16 @@
+<section class="panel">
+  <h3>仿真控制</h3>
+  <div class="buttons">
+    <button type="button" (click)="singleStep.emit()">单步</button>
+    <button type="button" (click)="toggleRun.emit()">{{ isRunning ? '暂停' : '连续演化' }}</button>
+    <button type="button" (click)="undo.emit()">回退</button>
+    <button type="button" (click)="reset.emit()">重置</button>
+  </div>
+
+  <label>
+    速度(ms): {{ speedMs }}
+    <input type="range" min="80" max="1200" step="20" [(ngModel)]="speedMs" (ngModelChange)="speedChange.emit($event)" />
+  </label>
+
+  <p>当前代数: {{ generation }}</p>
+</section>

@@ -1,0 +1,76 @@
+<main class="layout">
+  <header>
+    <h1>元胞自动机仿真与学习平台</h1>
+    <p>支持生命游戏、Rule30、Rule110，覆盖课程作业基础功能与学习评测流程。</p>
+  </header>
+
+  <section class="main-content">
+    <div class="left-column">
+      <app-rule-editor [ruleConfig]="ruleConfig" (ruleConfigChange)="onRuleChange($event)" />
+      <app-control-panel
+        [generation]="generation"
+        [isRunning]="isRunning"
+        [speedMs]="speedMs"
+        (singleStep)="runSingleStep()"
+        (toggleRun)="toggleAutoRun()"
+        (undo)="undoStep()"
+        (reset)="resetFromInitial()"
+        (speedChange)="onSpeedChange($event)" />
+
+      <section class="panel">
+        <h3>初始化配置</h3>
+        <div class="button-row">
+          <button type="button" (click)="randomizeGrid()">随机生成</button>
+          <button type="button" (click)="clearGrid()">清空画布</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>预设模型库（进阶）</h3>
+        <div class="button-row">
+          @for (preset of presets; track preset.id) {
+            <button type="button" (click)="applyPreset(preset.id)">{{ preset.title }}</button>
+          }
+        </div>
+      </section>
+    </div>
+
+    <div class="center-column">
+      <app-grid-canvas
+        [grid]="grid"
+        [selectedCell]="selectedCell"
+        [neighborhoodType]="ruleConfig.neighborhoodType"
+        (cellToggle)="toggleCell($event)"
+        (cellSelected)="selectedCell = $event" />
+      <p class="status">代数 {{ generation }} | 本轮变化 {{ changedCount }} 个细胞</p>
+    </div>
+
+    <div class="right-column">
+      <app-tutorial-panel
+        [grid]="grid"
+        [selectedCell]="selectedCell"
+        [neighborhoodType]="ruleConfig.neighborhoodType"
+        [surviveMin]="ruleConfig.surviveMin"
+        [surviveMax]="ruleConfig.surviveMax"
+        [birthValue]="ruleConfig.birthValue" />
+
+      <section class="panel">
+        <h3>评估与测试（5个场景）</h3>
+        <select [(ngModel)]="selectedScenarioId">
+          @for (scenario of scenarios; track scenario.id) {
+            <option [value]="scenario.id">{{ scenario.title }}</option>
+          }
+        </select>
+        <div class="button-row">
+          <button type="button" (click)="loadScenarioToCanvas()">载入场景</button>
+          <button type="button" (click)="checkCurrentScenario()">检查答案</button>
+        </div>
+        @if (evaluationResult) {
+          <p [class.success]="evaluationResult.correct" [class.error]="!evaluationResult.correct">
+            {{ evaluationResult.message }}（差异数: {{ evaluationResult.diffCount }}）
+          </p>
+        }
+      </section>
+    </div>
+  </section>
+</main>

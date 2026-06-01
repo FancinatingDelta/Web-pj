@@ -1,0 +1,16 @@
+.panel {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  min-height: 130px;
+}
+
+h3 {
+  margin-top: 0;
+}
+
+p {
+  margin-bottom: 0;
+  line-height: 1.5;
+}

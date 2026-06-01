@@ -1,0 +1,31 @@
+.grid-board {
+  display: inline-block;
+  padding: 12px;
+  background: #111827;
+  border-radius: 10px;
+}
+
+.grid-row {
+  display: flex;
+}
+
+.cell {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #1f2937;
+  background: #e5e7eb;
+  margin: 1px;
+  cursor: pointer;
+}
+
+.cell.alive {
+  background: #22c55e;
+}
+
+.cell.selected {
+  box-shadow: 0 0 0 2px #f59e0b inset;
+}
+
+.cell.neighbor {
+  background: #93c5fd;
+}

@@ -1,0 +1,16 @@
+<div class="grid-board">
+  @for (row of grid; track $index; let rowIndex = $index) {
+    <div class="grid-row">
+      @for (cell of row; track $index; let colIndex = $index) {
+        <button
+          type="button"
+          class="cell"
+          [class.alive]="cell === 1"
+          [class.selected]="selectedCell?.row === rowIndex && selectedCell?.col === colIndex"
+          [class.neighbor]="isNeighborCell(rowIndex, colIndex)"
+          (click)="onCellClick(rowIndex, colIndex)">
+        </button>
+      }
+    </div>
+  }
+</div>

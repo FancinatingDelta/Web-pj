@@ -1,0 +1,90 @@
+:host {
+  display: block;
+  font-family: Arial, sans-serif;
+  background: #f3f4f6;
+  min-height: 100vh;
+  color: #111827;
+}
+
+.layout {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header h1 {
+  margin: 0 0 4px 0;
+}
+
+header p {
+  margin: 0 0 16px 0;
+  color: #4b5563;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.center-column {
+  text-align: center;
+}
+
+.panel {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: #ffffff;
+  height: 32px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+select {
+  width: 100%;
+  height: 32px;
+  margin-bottom: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.status {
+  margin-top: 8px;
+  color: #1f2937;
+}
+
+.success {
+  color: #15803d;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+@media (max-width: 1200px) {
+  .main-content {
+    grid-template-columns: 1fr;
+  }
+}

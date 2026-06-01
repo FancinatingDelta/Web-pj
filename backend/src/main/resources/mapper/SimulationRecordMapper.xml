@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pj.mapper.SimulationRecordMapper">
+
+    <insert id="insert" parameterType="com.pj.domain.SimulationRecord"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO simulation_record(username, model_id, steps, score, created_at)
+        VALUES (#{username}, #{modelId}, #{steps}, #{score}, NOW())
+    </insert>
+</mapper>

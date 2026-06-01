@@ -1,0 +1,39 @@
+<section class="panel">
+  <h3>规则编辑器</h3>
+
+  <label>
+    模型
+    <select [(ngModel)]="ruleConfig.automataType" (ngModelChange)="onAutomataTypeChanged()">
+      @for (option of automataOptions; track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+  </label>
+
+  @if (ruleConfig.automataType === 'LIFE_GAME_2D') {
+    <label>
+      邻居类型
+      <select [(ngModel)]="ruleConfig.neighborhoodType" (ngModelChange)="emitChange()">
+        <option value="MOORE">摩尔邻居</option>
+        <option value="VON_NEUMANN">冯诺依曼邻居</option>
+      </select>
+    </label>
+    <label>
+      生存最小邻居数
+      <input type="number" min="0" max="8" [(ngModel)]="ruleConfig.surviveMin" (ngModelChange)="emitChange()" />
+    </label>
+    <label>
+      生存最大邻居数
+      <input type="number" min="0" max="8" [(ngModel)]="ruleConfig.surviveMax" (ngModelChange)="emitChange()" />
+    </label>
+    <label>
+      复活邻居数
+      <input type="number" min="0" max="8" [(ngModel)]="ruleConfig.birthValue" (ngModelChange)="emitChange()" />
+    </label>
+  } @else {
+    <label>
+      规则号
+      <input type="number" min="0" max="255" [(ngModel)]="ruleConfig.ruleNumber" (ngModelChange)="emitChange()" />
+    </label>
+  }
+</section>
