@@ -6,21 +6,21 @@ import {
   EvaluationScenario,
   PresetModel,
   RuleConfig,
-  SimulationStepResponse
+  SimulationStepResponse,
 } from '../models/simulation.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SimulationApiService {
-  private readonly baseUrl = 'http://localhost:8080/api';
+  private readonly baseUrl = '/api';
 
   constructor(private readonly http: HttpClient) {}
 
   step(grid: number[][], ruleConfig: RuleConfig): Observable<SimulationStepResponse> {
     return this.http.post<SimulationStepResponse>(`${this.baseUrl}/simulation/step`, {
       grid,
-      ruleConfig
+      ruleConfig,
     });
   }
 
@@ -35,7 +35,7 @@ export class SimulationApiService {
   checkScenario(scenarioId: string, answerGrid: number[][]): Observable<EvaluationResult> {
     return this.http.post<EvaluationResult>(`${this.baseUrl}/evaluation/check`, {
       scenarioId,
-      answerGrid
+      answerGrid,
     });
   }
 }
