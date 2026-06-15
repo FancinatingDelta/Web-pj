@@ -10,16 +10,23 @@ import { NeighborhoodType } from '../../models/simulation.model';
 })
 export class GridCanvasComponent {
   @Input() grid: number[][] = [];
-  @Input() clickable = true;
+  @Input() editMode = true;
   @Input() selectedCell: { row: number; col: number } | null = null;
   @Input() neighborhoodType: NeighborhoodType = 'MOORE';
 
   @Output() cellToggle = new EventEmitter<{ row: number; col: number }>();
-  @Output() cellSelected = new EventEmitter<{ row: number; col: number }>();
+  @Output() cellSelected = new EventEmitter<{ row: number; col: number } | null>();
 
   onCellClick(row: number, col: number): void {
+    if (this.selectedCell?.row === row && this.selectedCell?.col === col) {
+      this.cellSelected.emit(null);
+      if (this.editMode) {
+        this.cellToggle.emit({ row, col });
+      }
+      return;
+    }
     this.cellSelected.emit({ row, col });
-    if (this.clickable) {
+    if (this.editMode) {
       this.cellToggle.emit({ row, col });
     }
   }

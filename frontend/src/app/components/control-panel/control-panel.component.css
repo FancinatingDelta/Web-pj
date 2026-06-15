@@ -5,6 +5,65 @@
   border: 1px solid #e5e7eb;
 }
 
+/* Mode toggle */
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f3f4f6;
+}
+
+.mode-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  transition: color 0.2s;
+}
+
+.mode-label.inactive {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.25s;
+  padding: 0;
+}
+
+.toggle-switch.edit {
+  background: #22c55e;
+}
+
+.toggle-switch.observe {
+  background: #3b82f6;
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s;
+}
+
+.toggle-switch.observe .toggle-knob {
+  transform: translateX(20px);
+}
+
 .buttons {
   display: flex;
   flex-wrap: wrap;
@@ -22,6 +81,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
 label {
   display: block;
   font-size: 14px;
@@ -29,4 +93,43 @@ label {
 
 input[type='range'] {
   width: 100%;
+}
+
+h4 {
+  margin: 0 0 6px 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.section-divider {
+  border-top: 1px solid #e5e7eb;
+  margin: 10px 0;
+}
+
+/* History list */
+.history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.history-list li {
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #374151;
+  transition: background 0.15s;
+}
+
+.history-list li:hover {
+  background: #f3f4f6;
+}
+
+.history-list li.current {
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-weight: 600;
 }

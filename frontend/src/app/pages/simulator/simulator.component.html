@@ -1,6 +1,14 @@
 <main class="layout">
   <header>
-    <h1>元胞自动机仿真与学习平台</h1>
+    <div class="header-top">
+      <h1>元胞自动机仿真与学习平台</h1>
+      @if (username) {
+        <span class="user-info">
+          欢迎，<strong>{{ username }}</strong>
+          <button type="button" class="logout-btn" (click)="logout()">退出</button>
+        </span>
+      }
+    </div>
     <p>支持生命游戏、Rule30、Rule110，覆盖课程作业基础功能与学习评测流程。</p>
   </header>
 
@@ -11,22 +19,23 @@
         [generation]="generation"
         [isRunning]="isRunning"
         [speedMs]="speedMs"
+        [historyCount]="historyCount"
+        [currentGeneration]="generation"
         (singleStep)="runSingleStep()"
         (toggleRun)="toggleAutoRun()"
         (undo)="undoStep()"
         (reset)="resetFromInitial()"
-        (speedChange)="onSpeedChange($event)" />
+        (speedChange)="onSpeedChange($event)"
+        (jumpTo)="jumpToHistory($event)"
+        [editMode]="editMode"
+        (editModeChange)="editMode = $event"
+        (randomize)="randomizeGrid()"
+        (clear)="clearGrid()"
+        (exportGrid)="exportGrid()"
+        (fileSelected)="importFromJSON($event)" />
 
       <section class="panel">
-        <h3>初始化配置</h3>
-        <div class="button-row">
-          <button type="button" (click)="randomizeGrid()">随机生成</button>
-          <button type="button" (click)="clearGrid()">清空画布</button>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h3>预设模型库（进阶）</h3>
+        <h3>预设模型库</h3>
         <div class="button-row">
           @for (preset of presets; track preset.id) {
             <button type="button" (click)="applyPreset(preset.id)">{{ preset.title }}</button>
@@ -39,6 +48,7 @@
       <app-grid-canvas
         [grid]="grid"
         [selectedCell]="selectedCell"
+        [editMode]="editMode"
         [neighborhoodType]="ruleConfig.neighborhoodType"
         (cellToggle)="toggleCell($event)"
         (cellSelected)="selectedCell = $event" />

@@ -8,9 +8,180 @@
 
 h3 {
   margin-top: 0;
+  margin-bottom: 12px;
 }
 
-p {
-  margin-bottom: 0;
+.hint {
+  color: #6b7280;
   line-height: 1.5;
+}
+
+/* Step indicators */
+.step-indicators {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.3s, color 0.3s, transform 0.3s;
+}
+
+.dot.active {
+  background: #2563eb;
+  color: #fff;
+}
+
+.dot.current {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
+}
+
+.connector {
+  width: 32px;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 0 4px;
+  transition: background 0.3s;
+}
+
+.connector.filled {
+  background: #2563eb;
+}
+
+.step-labels {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.step-labels span {
+  transition: color 0.3s, font-weight 0.3s;
+}
+
+.step-labels .highlight {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Step content */
+.step-content {
+  min-height: 80px;
+  margin-bottom: 8px;
+}
+
+.step-card {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  line-height: 1.5;
+  font-size: 14px;
+  animation: fadeSlideIn 0.35s ease;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Neighbor mini grid */
+.neighbor-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.mini-cell {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: #e5e7eb;
+  border: 1px solid #d1d5db;
+}
+
+.mini-cell.alive {
+  background: #22c55e;
+  border-color: #16a34a;
+}
+
+.legend {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend .mini-cell {
+  display: inline-block;
+}
+
+/* Prediction states */
+.prediction-alive {
+  border-left: 3px solid #22c55e;
+}
+
+.prediction-dead {
+  border-left: 3px solid #ef4444;
+}
+
+.prediction-birth {
+  border-left: 3px solid #f59e0b;
+}
+
+.prediction-text {
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+}
+
+/* Navigation */
+.step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.step-nav button {
+  border: none;
+  border-radius: 4px;
+  background: #2563eb;
+  color: #fff;
+  height: 28px;
+  padding: 0 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.step-nav button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+.step-info {
+  font-size: 12px;
+  color: #6b7280;
 }

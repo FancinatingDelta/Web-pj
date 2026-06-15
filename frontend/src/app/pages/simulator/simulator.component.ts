@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subscription, interval, switchMap } from 'rxjs';
 import { ControlPanelComponent } from '../../components/control-panel/control-panel.component';
 import { GridCanvasComponent } from '../../components/grid-canvas/grid-canvas.component';
@@ -12,6 +13,7 @@ import {
   PresetModel,
   RuleConfig
 } from '../../models/simulation.model';
+import { AuthService } from '../../services/auth.service';
 import { SimulationApiService } from '../../services/simulation-api.service';
 
 @Component({
@@ -43,6 +45,8 @@ export class SimulatorComponent implements OnInit, OnDestroy {
   speedMs = 400;
   selectedCell: { row: number; col: number } | null = null;
   changedCount = 0;
+  editMode = true;
+  username: string | null = null;
 
   presets: PresetModel[] = [];
   scenarios: EvaluationScenario[] = [];
@@ -51,15 +55,24 @@ export class SimulatorComponent implements OnInit, OnDestroy {
 
   private runnerSub: Subscription | null = null;
 
-  constructor(private readonly api: SimulationApiService) {}
+  constructor(
+    private readonly api: SimulationApiService,
+    private readonly authService: AuthService,
+    private readonly router: Router
+  ) {}
 
   ngOnInit(): void {
+    this.username = this.authService.getCurrentUser();
     this.loadPresets();
     this.loadScenarios();
   }
 
   ngOnDestroy(): void {
     this.stopAutoRun();
+  }
+
+  get historyCount(): number {
+    return this.history.length;
   }
 
   onRuleChange(nextConfig: RuleConfig): void {
@@ -72,10 +85,12 @@ export class SimulatorComponent implements OnInit, OnDestroy {
       this.grid = [new Array(61).fill(0)];
       this.grid[0][30] = 1;
     }
+    this.selectedCell = null;
     this.resetEvolutionStats();
   }
 
   toggleCell(position: { row: number; col: number }): void {
+    if (!this.editMode) return;
     this.grid[position.row][position.col] = this.grid[position.row][position.col] === 1 ? 0 : 1;
     this.grid = this.grid.map((row) => [...row]);
   }
@@ -134,6 +149,15 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     this.generation = Math.max(0, this.generation - 1);
   }
 
+  jumpToHistory(targetGen: number): void {
+    if (targetGen < 0 || targetGen >= this.history.length) return;
+    this.stopAutoRun();
+    this.grid = this.cloneGrid(this.history[targetGen]);
+    this.history = this.history.slice(0, targetGen);
+    this.generation = targetGen;
+    this.changedCount = 0;
+  }
+
   resetFromInitial(): void {
     this.stopAutoRun();
     this.clearGrid();
@@ -167,6 +191,48 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     this.api.checkScenario(this.selectedScenarioId, this.grid).subscribe((result) => {
       this.evaluationResult = result;
     });
+  }
+
+  exportGrid(): void {
+    const data = {
+      ruleConfig: this.ruleConfig,
+      grid: this.grid,
+      generation: this.generation
+    };
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cellular-automata-export.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  importFromJSON(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result as string);
+        if (!data.grid || !data.ruleConfig) {
+          alert('无效的导入文件：缺少 grid 或 ruleConfig 字段。');
+          return;
+        }
+        this.ruleConfig = data.ruleConfig;
+        this.grid = data.grid;
+        this.resetEvolutionStats();
+        this.generation = data.generation ?? 0;
+        this.selectedCell = null;
+      } catch {
+        alert('文件解析失败，请检查是否为有效的 JSON 文件。');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   private loadPresets(): void {

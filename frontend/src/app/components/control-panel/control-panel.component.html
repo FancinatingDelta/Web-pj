@@ -1,9 +1,24 @@
 <section class="panel">
   <h3>仿真控制</h3>
+
+  <div class="mode-toggle">
+    <span class="mode-label" [class.inactive]="editMode">观察模式</span>
+    <button
+      type="button"
+      class="toggle-switch"
+      [class.edit]="editMode"
+      [class.observe]="!editMode"
+      [title]="editMode ? '点击切换为观察模式' : '点击切换为编辑模式'"
+      (click)="editModeChange.emit(!editMode)">
+      <span class="toggle-knob"></span>
+    </button>
+    <span class="mode-label" [class.inactive]="!editMode">编辑模式</span>
+  </div>
+
   <div class="buttons">
     <button type="button" (click)="singleStep.emit()">单步</button>
     <button type="button" (click)="toggleRun.emit()">{{ isRunning ? '暂停' : '连续演化' }}</button>
-    <button type="button" (click)="undo.emit()">回退</button>
+    <button type="button" (click)="undo.emit()" [disabled]="historyCount === 0">回退</button>
     <button type="button" (click)="reset.emit()">重置</button>
   </div>
 
@@ -13,4 +28,29 @@
   </label>
 
   <p>当前代数: {{ generation }}</p>
+
+  <div class="section-divider"></div>
+
+  <h4>初始化配置</h4>
+  <div class="buttons">
+    <button type="button" (click)="randomize.emit()">随机生成</button>
+    <button type="button" (click)="clear.emit()">清空画布</button>
+    <button type="button" (click)="exportGrid.emit()">导出JSON</button>
+    <button type="button" (click)="fileInput.click()">导入JSON</button>
+    <input #fileInput type="file" accept=".json" hidden (change)="onFileSelected($event)" />
+  </div>
+
+  @if (historyCount > 0) {
+    <div class="section-divider"></div>
+    <h4>演化记录</h4>
+    <ul class="history-list">
+      @for (idx of historyIndices; track idx) {
+        <li
+          [class.current]="idx === currentGeneration"
+          (click)="jumpTo.emit(idx)">
+          第 {{ idx }} 代
+        </li>
+      }
+    </ul>
+  }
 </section>

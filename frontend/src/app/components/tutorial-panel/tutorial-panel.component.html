@@ -1,4 +1,54 @@
 <section class="panel">
   <h3>动态教学面板</h3>
-  <p>{{ explanation }}</p>
+
+  @if (!selectedCell) {
+    <p class="hint">点击画布中的一个细胞，可查看其邻域统计与下一步状态推断。</p>
+  } @else {
+    <div class="step-indicators">
+      <span class="dot" [class.active]="currentStep >= 1" [class.current]="currentStep === 1">1</span>
+      <span class="connector" [class.filled]="currentStep >= 2"></span>
+      <span class="dot" [class.active]="currentStep >= 2" [class.current]="currentStep === 2">2</span>
+      <span class="connector" [class.filled]="currentStep >= 3"></span>
+      <span class="dot" [class.active]="currentStep >= 3" [class.current]="currentStep === 3">3</span>
+    </div>
+    <div class="step-labels">
+      <span [class.highlight]="currentStep === 1">邻居高亮</span>
+      <span [class.highlight]="currentStep === 2">规则计算</span>
+      <span [class.highlight]="currentStep === 3">预测结果</span>
+    </div>
+
+    <div class="step-content">
+      @if (currentStep === 1) {
+        <div class="step-card step-1">
+          <p>{{ step1Text }}</p>
+          <div class="neighbor-grid">
+            @for (coord of neighborCoords; track coord.row + '-' + coord.col) {
+              <span
+                class="mini-cell"
+                [class.alive]="grid[coord.row][coord.col] === 1"
+                [title]="'(' + coord.row + ', ' + coord.col + '): ' + (grid[coord.row][coord.col] === 1 ? '存活' : '死亡')">
+              </span>
+            }
+          </div>
+          <p class="legend"><span class="mini-cell alive"></span> 存活邻居 &nbsp; <span class="mini-cell"></span> 死亡邻居</p>
+        </div>
+      }
+      @if (currentStep === 2) {
+        <div class="step-card step-2">
+          <p>{{ step2Text }}</p>
+        </div>
+      }
+      @if (currentStep === 3) {
+        <div class="step-card step-3" [class.prediction-alive]="predictedState === 'alive'" [class.prediction-dead]="predictedState === 'dead'" [class.prediction-birth]="predictedState === 'birth'">
+          <p class="prediction-text">{{ step3Text }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="step-nav">
+      <button type="button" [disabled]="currentStep <= 1" (click)="prevStep()">上一步</button>
+      <span class="step-info">{{ currentStep }} / 3</span>
+      <button type="button" [disabled]="currentStep >= 3" (click)="nextStep()">下一步</button>
+    </div>
+  }
 </section>

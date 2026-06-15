@@ -12,8 +12,39 @@
   padding: 20px;
 }
 
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 header h1 {
-  margin: 0 0 4px 0;
+  margin: 0;
+}
+
+.user-info {
+  font-size: 14px;
+  color: #374151;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-btn {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  color: #6b7280;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
 }
 
 header p {
