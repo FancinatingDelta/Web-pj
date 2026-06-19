@@ -43,11 +43,13 @@
 
       <section class="panel">
         <h3>预设模型库</h3>
-        <div class="button-row">
-          @for (preset of presets; track preset.id) {
-            <button type="button" (click)="applyPreset(preset.id)">{{ preset.title }}</button>
-          }
-        </div>
+        @for (preset of presets; track preset.id) {
+          <div class="preset-card">
+            <h4>{{ preset.title }}</h4>
+            <p class="preset-desc">{{ preset.description }}</p>
+            <button type="button" (click)="applyPreset(preset.id)">加载模型</button>
+          </div>
+        }
       </section>
     </div>
 
