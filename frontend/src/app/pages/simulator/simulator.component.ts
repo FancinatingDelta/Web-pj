@@ -38,7 +38,8 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     surviveMin: 2,
     surviveMax: 3,
     birthValue: 3,
-    ruleNumber: 0
+    ruleNumber: 0,
+    probability: 1
   };
   gridRows = 20;
   gridCols = 20;

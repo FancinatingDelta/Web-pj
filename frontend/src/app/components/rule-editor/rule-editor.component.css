@@ -25,3 +25,8 @@ select {
   border-radius: 6px;
   padding: 0 8px;
 }
+
+.section-divider {
+  border-top: 1px solid #e5e7eb;
+  margin: 10px 0;
+}

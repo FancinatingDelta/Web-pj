@@ -8,6 +8,7 @@ export interface RuleConfig {
   surviveMax: number;
   birthValue: number;
   ruleNumber: number;
+  probability: number;
 }
 
 export interface SimulationStepResponse {

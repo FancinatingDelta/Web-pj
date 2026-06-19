@@ -14,7 +14,7 @@ public class SimulationService {
         if (ruleConfig.getAutomataType() == AutomataType.LIFE_GAME_2D) {
             nextGrid = nextForLifeGame(grid, ruleConfig);
         } else {
-            nextGrid = nextForRule(grid, ruleConfig.getRuleNumber());
+            nextGrid = nextForRule(grid, ruleConfig.getRuleNumber(), ruleConfig.getProbability());
         }
         return new SimulationStepResponse(nextGrid, calculateChangedCount(grid, nextGrid));
     }
@@ -46,20 +46,26 @@ public class SimulationService {
         int rows = grid.length;
         int cols = grid[0].length;
         int[][] next = new int[rows][cols];
+        double p = ruleConfig.getProbability();
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 int neighbors = countNeighbors(grid, r, c, ruleConfig.getNeighborhoodType());
+                int nextState;
                 if (grid[r][c] == 1) {
-                    next[r][c] = (neighbors >= ruleConfig.getSurviveMin() && neighbors <= ruleConfig.getSurviveMax()) ? 1 : 0;
+                    nextState = (neighbors >= ruleConfig.getSurviveMin() && neighbors <= ruleConfig.getSurviveMax()) ? 1 : 0;
                 } else {
-                    next[r][c] = (neighbors == ruleConfig.getBirthValue()) ? 1 : 0;
+                    nextState = (neighbors == ruleConfig.getBirthValue()) ? 1 : 0;
                 }
+                if (nextState != grid[r][c] && Math.random() >= p) {
+                    nextState = grid[r][c];
+                }
+                next[r][c] = nextState;
             }
         }
         return next;
     }
 
-    private int[][] nextForRule(int[][] grid, int ruleNumber) {
+    private int[][] nextForRule(int[][] grid, int ruleNumber, double probability) {
         int cols = grid[0].length;
         int[][] next = new int[1][cols];
         for (int c = 0; c < cols; c++) {
@@ -67,7 +73,11 @@ public class SimulationService {
             int center = grid[0][c];
             int right = (c == cols - 1) ? 0 : grid[0][c + 1];
             int pattern = (left << 2) | (center << 1) | right;
-            next[0][c] = (ruleNumber >> pattern) & 1;
+            int nextState = (ruleNumber >> pattern) & 1;
+            if (nextState != grid[0][c] && Math.random() >= probability) {
+                nextState = grid[0][c];
+            }
+            next[0][c] = nextState;
         }
         return next;
     }

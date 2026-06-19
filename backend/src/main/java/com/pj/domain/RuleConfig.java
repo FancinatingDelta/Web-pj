@@ -7,6 +7,7 @@ public class RuleConfig {
     private int surviveMax;
     private int birthValue;
     private int ruleNumber;
+    private double probability = 1.0;
 
     public AutomataType getAutomataType() {
         return automataType;
@@ -54,5 +55,13 @@ public class RuleConfig {
 
     public void setRuleNumber(int ruleNumber) {
         this.ruleNumber = ruleNumber;
+    }
+
+    public double getProbability() {
+        return probability;
+    }
+
+    public void setProbability(double probability) {
+        this.probability = probability;
     }
 }
