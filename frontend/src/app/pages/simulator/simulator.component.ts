@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Subscription, interval, switchMap } from 'rxjs';
 import { ControlPanelComponent } from '../../components/control-panel/control-panel.component';
 import { GridCanvasComponent } from '../../components/grid-canvas/grid-canvas.component';
+import { GridConfigComponent } from '../../components/grid-config/grid-config.component';
 import { RuleEditorComponent } from '../../components/rule-editor/rule-editor.component';
 import { TutorialPanelComponent } from '../../components/tutorial-panel/tutorial-panel.component';
 import {
@@ -22,6 +23,7 @@ import { SimulationApiService } from '../../services/simulation-api.service';
     CommonModule,
     FormsModule,
     GridCanvasComponent,
+    GridConfigComponent,
     RuleEditorComponent,
     ControlPanelComponent,
     TutorialPanelComponent
@@ -38,7 +40,9 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     birthValue: 3,
     ruleNumber: 0
   };
-  grid: number[][] = this.createGrid(20, 20);
+  gridRows = 20;
+  gridCols = 20;
+  grid: number[][] = this.createGrid(this.gridRows, this.gridCols);
   history: number[][][] = [];
   generation = 0;
   isRunning = false;
@@ -78,12 +82,23 @@ export class SimulatorComponent implements OnInit, OnDestroy {
   onRuleChange(nextConfig: RuleConfig): void {
     this.ruleConfig = nextConfig;
     if (this.ruleConfig.automataType === 'LIFE_GAME_2D') {
-      if (this.grid.length !== 20 || this.grid[0].length !== 20) {
-        this.grid = this.createGrid(20, 20);
-      }
+      this.grid = this.createGrid(this.gridRows, this.gridCols);
     } else {
-      this.grid = [new Array(61).fill(0)];
-      this.grid[0][30] = 1;
+      this.grid = this.createGrid(1, this.gridCols);
+      this.grid[0][Math.floor(this.gridCols / 2)] = 1;
+    }
+    this.selectedCell = null;
+    this.resetEvolutionStats();
+  }
+
+  onGridConfirm(dims: { rows: number; cols: number }): void {
+    this.gridRows = dims.rows;
+    this.gridCols = dims.cols;
+    if (this.ruleConfig.automataType === 'LIFE_GAME_2D') {
+      this.grid = this.createGrid(this.gridRows, this.gridCols);
+    } else {
+      this.grid = this.createGrid(1, this.gridCols);
+      this.grid[0][Math.floor(this.gridCols / 2)] = 1;
     }
     this.selectedCell = null;
     this.resetEvolutionStats();

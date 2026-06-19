@@ -14,7 +14,14 @@
 
   <section class="main-content">
     <div class="left-column">
-      <app-rule-editor [ruleConfig]="ruleConfig" (ruleConfigChange)="onRuleChange($event)" />
+      <app-grid-config
+        [rows]="gridRows"
+        [cols]="gridCols"
+        [is2D]="ruleConfig.automataType === 'LIFE_GAME_2D'"
+        (confirmed)="onGridConfirm($event)" />
+      <app-rule-editor
+        [ruleConfig]="ruleConfig"
+        (ruleConfigChange)="onRuleChange($event)" />
       <app-control-panel
         [generation]="generation"
         [isRunning]="isRunning"

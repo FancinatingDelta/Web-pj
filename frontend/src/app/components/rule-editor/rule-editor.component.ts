@@ -35,4 +35,8 @@ export class RuleEditorComponent {
   emitChange(): void {
     this.ruleConfigChange.emit({ ...this.ruleConfig });
   }
+
+  get is2D(): boolean {
+    return this.ruleConfig.automataType === 'LIFE_GAME_2D';
+  }
 }

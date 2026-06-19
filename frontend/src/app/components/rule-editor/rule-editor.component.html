@@ -10,7 +10,7 @@
     </select>
   </label>
 
-  @if (ruleConfig.automataType === 'LIFE_GAME_2D') {
+  @if (is2D) {
     <label>
       邻居类型
       <select [(ngModel)]="ruleConfig.neighborhoodType" (ngModelChange)="emitChange()">
@@ -36,4 +36,5 @@
       <input type="number" min="0" max="255" [(ngModel)]="ruleConfig.ruleNumber" (ngModelChange)="emitChange()" />
     </label>
   }
+
 </section>
