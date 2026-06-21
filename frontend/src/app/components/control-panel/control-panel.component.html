@@ -53,4 +53,30 @@
       }
     </ul>
   }
+
+  <div class="section-divider"></div>
+  <h4>本地存档</h4>
+  <div class="save-row">
+    <input type="text" [(ngModel)]="saveName" placeholder="存档名称（如：实验1）" maxlength="30" />
+    <button type="button" (click)="onSaveClick()">保存</button>
+  </div>
+
+  @if (savedRecords.length > 0) {
+    <ul class="record-list">
+      @for (record of savedRecords; track record.id) {
+        <li>
+          <div class="record-info">
+            <span class="record-name">{{ record.name }}</span>
+            <span class="record-meta">{{ record.generation }} 代 · {{ record.automataType }}</span>
+          </div>
+          <div class="record-actions">
+            <button type="button" (click)="loadRecord.emit(record.id)">加载</button>
+            <button type="button" (click)="deleteRecord.emit(record.id)">删除</button>
+          </div>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="hint">暂无存档，保存后在此处管理。</p>
+  }
 </section>
