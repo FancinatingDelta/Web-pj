@@ -23,6 +23,7 @@ public class PresetService {
         config.setSurviveMax(3);
         config.setBirthValue(3);
         config.setRuleNumber(0);
+        config.setProbability(1.0);
 
         int[][] grid = new int[20][20];
         grid[1][2] = 1;
@@ -45,6 +46,7 @@ public class PresetService {
         config.setAutomataType(AutomataType.RULE_30_1D);
         config.setNeighborhoodType(NeighborhoodType.MOORE);
         config.setRuleNumber(30);
+        config.setProbability(1.0);
 
         int[][] grid = new int[1][61];
         grid[0][30] = 1;
@@ -63,6 +65,7 @@ public class PresetService {
         config.setAutomataType(AutomataType.RULE_110_1D);
         config.setNeighborhoodType(NeighborhoodType.MOORE);
         config.setRuleNumber(110);
+        config.setProbability(1.0);
 
         int[][] grid = new int[1][61];
         grid[0][30] = 1;

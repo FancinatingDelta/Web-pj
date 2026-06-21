@@ -29,6 +29,16 @@ export class RuleEditorComponent {
     } else {
       this.ruleConfig.ruleNumber = 110;
     }
+    this.ruleConfig.probability = 1;
+    this.emitChange();
+  }
+
+  get displayProbability(): number {
+    return Math.round(this.ruleConfig.probability * 100);
+  }
+
+  set displayProbability(value: number) {
+    this.ruleConfig.probability = Math.max(0, Math.min(100, value)) / 100;
     this.emitChange();
   }
 
