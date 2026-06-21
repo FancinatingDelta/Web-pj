@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RecordSummary } from '../../services/storage.service';
 
 @Component({
   selector: 'app-control-panel',
@@ -14,6 +15,7 @@ export class ControlPanelComponent {
   @Input() historyCount = 0;
   @Input() currentGeneration = 0;
   @Input() editMode = true;
+  @Input() savedRecords: RecordSummary[] = [];
 
   @Output() editModeChange = new EventEmitter<boolean>();
   @Output() singleStep = new EventEmitter<void>();
@@ -26,6 +28,11 @@ export class ControlPanelComponent {
   @Output() clear = new EventEmitter<void>();
   @Output() exportGrid = new EventEmitter<void>();
   @Output() fileSelected = new EventEmitter<File>();
+  @Output() saveToLibrary = new EventEmitter<string>();
+  @Output() loadRecord = new EventEmitter<number>();
+  @Output() deleteRecord = new EventEmitter<number>();
+
+  saveName = '';
 
   get historyIndices(): number[] {
     return Array.from({ length: this.historyCount }, (_, i) => i);
@@ -37,5 +44,12 @@ export class ControlPanelComponent {
       this.fileSelected.emit(input.files[0]);
       input.value = '';
     }
+  }
+
+  onSaveClick(): void {
+    const name = this.saveName.trim();
+    if (!name) return;
+    this.saveToLibrary.emit(name);
+    this.saveName = '';
   }
 }

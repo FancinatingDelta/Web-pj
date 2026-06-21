@@ -15,6 +15,7 @@ import {
   RuleConfig
 } from '../../models/simulation.model';
 import { AuthService } from '../../services/auth.service';
+import { RecordSummary, StorageService } from '../../services/storage.service';
 import { SimulationApiService } from '../../services/simulation-api.service';
 
 @Component({
@@ -57,19 +58,26 @@ export class SimulatorComponent implements OnInit, OnDestroy {
   scenarios: EvaluationScenario[] = [];
   selectedScenarioId = '';
   evaluationResult: EvaluationResult | null = null;
+  savedRecords: RecordSummary[] = [];
 
   private runnerSub: Subscription | null = null;
 
   constructor(
     private readonly api: SimulationApiService,
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly storage: StorageService
   ) {}
 
   ngOnInit(): void {
     this.username = this.authService.getCurrentUser();
+    if (this.username) {
+      this.storage.setCurrentUser(this.username);
+    }
+    this.restoreDraft();
     this.loadPresets();
     this.loadScenarios();
+    this.loadRecordList();
   }
 
   ngOnDestroy(): void {
@@ -130,6 +138,7 @@ export class SimulatorComponent implements OnInit, OnDestroy {
       this.grid = response.nextGrid;
       this.changedCount = response.changedCount;
       this.generation += 1;
+      this.saveDraftAsync();
     });
   }
 
@@ -146,6 +155,7 @@ export class SimulatorComponent implements OnInit, OnDestroy {
         this.grid = response.nextGrid;
         this.changedCount = response.changedCount;
         this.generation += 1;
+        this.saveDraftAsync();
       });
   }
 
@@ -163,6 +173,7 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     }
     this.grid = this.history.pop() ?? this.grid;
     this.generation = Math.max(0, this.generation - 1);
+    this.saveDraftAsync();
   }
 
   jumpToHistory(targetGen: number): void {
@@ -172,11 +183,13 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     this.history = this.history.slice(0, targetGen);
     this.generation = targetGen;
     this.changedCount = 0;
+    this.saveDraftAsync();
   }
 
   resetFromInitial(): void {
     this.stopAutoRun();
     this.clearGrid();
+    this.storage.deleteDraft();
   }
 
   applyPreset(presetId: string): void {
@@ -246,7 +259,36 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     reader.readAsText(file);
   }
 
+  saveToLibrary(name: string): void {
+    this.storage.saveRecord(name, {
+      grid: this.grid,
+      ruleConfig: this.ruleConfig,
+      generation: this.generation,
+      history: this.history
+    }).then(() => this.loadRecordList());
+  }
+
+  loadRecordFromLibrary(id: number): void {
+    this.storage.loadRecord(id).then((data) => {
+      if (!data) return;
+      this.grid = data.grid;
+      this.ruleConfig = data.ruleConfig;
+      this.generation = data.generation;
+      this.history = data.history;
+      this.gridRows = data.grid.length;
+      this.gridCols = data.grid[0].length;
+      this.selectedCell = null;
+      this.stopAutoRun();
+      this.saveDraftAsync();
+    });
+  }
+
+  deleteRecordFromLibrary(id: number): void {
+    this.storage.deleteRecord(id).then(() => this.loadRecordList());
+  }
+
   logout(): void {
+    this.storage.clearCurrentUser();
     this.authService.logout();
     this.router.navigate(['/login']);
   }
@@ -274,6 +316,30 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     return grid.map((row) => [...row]);
   }
 
+  private async restoreDraft(): Promise<void> {
+    const draft = await this.storage.loadDraft();
+    if (!draft) return;
+    this.grid = draft.grid;
+    this.ruleConfig = draft.ruleConfig;
+    this.generation = draft.generation;
+    this.history = draft.history;
+    this.gridRows = draft.grid.length;
+    this.gridCols = draft.grid[0].length;
+  }
+
+  private saveDraftAsync(): void {
+    this.storage.saveDraft({
+      grid: this.grid,
+      ruleConfig: this.ruleConfig,
+      generation: this.generation,
+      history: this.history
+    }).catch(() => {});
+  }
+
+  private loadRecordList(): void {
+    this.storage.listRecords().then((list) => (this.savedRecords = list));
+  }
+
   private stopAutoRun(): void {
     this.isRunning = false;
     this.runnerSub?.unsubscribe();
@@ -285,5 +351,6 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     this.generation = 0;
     this.changedCount = 0;
     this.history = [];
+    this.saveDraftAsync();
   }
 }

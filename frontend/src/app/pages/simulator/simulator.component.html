@@ -39,7 +39,11 @@
         (randomize)="randomizeGrid()"
         (clear)="clearGrid()"
         (exportGrid)="exportGrid()"
-        (fileSelected)="importFromJSON($event)" />
+        (fileSelected)="importFromJSON($event)"
+        [savedRecords]="savedRecords"
+        (saveToLibrary)="saveToLibrary($event)"
+        (loadRecord)="loadRecordFromLibrary($event)"
+        (deleteRecord)="deleteRecordFromLibrary($event)" />
 
       <section class="panel">
         <h3>预设模型库</h3>
