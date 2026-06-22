@@ -20,6 +20,7 @@ export interface PresetModel {
   id: string;
   title: string;
   description: string;
+  category: string;
   ruleConfig: RuleConfig;
   initialGrid: number[][];
 }

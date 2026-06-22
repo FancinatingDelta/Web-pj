@@ -36,7 +36,13 @@ public class EvaluationService {
             return new EvaluationResult(false, "场景不存在", Integer.MAX_VALUE);
         }
 
-        int diff = simulationService.calculateDiffCount(scenario.getExpectedGrid(), answerGrid);
+        int[][] expected = scenario.getExpectedGrid();
+        int[][] actual = answerGrid;
+        if (scenario.getRuleConfig().getAutomataType() == AutomataType.LIFE_GAME_2D) {
+            expected = simulationService.normalizeGrid(expected);
+            actual = simulationService.normalizeGrid(actual);
+        }
+        int diff = simulationService.calculateDiffCount(expected, actual);
         if (diff == 0) {
             return new EvaluationResult(true, "结果正确，继续保持。", 0);
         }

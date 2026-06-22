@@ -27,6 +27,50 @@ public class SimulationService {
         return current;
     }
 
+    /**
+     * Trim empty border rows and columns so pattern comparison is
+     * position-independent (e.g. a 2x2 block at (1,1) matches at (5,5)).
+     */
+    public int[][] normalizeGrid(int[][] grid) {
+        int rows = grid.length;
+        int cols = grid[0].length;
+
+        int top = 0, bottom = rows - 1, left = 0, right = cols - 1;
+
+        while (top < rows && rowAllZero(grid, top)) top++;
+        while (bottom >= top && rowAllZero(grid, bottom)) bottom--;
+        while (left < cols && colAllZero(grid, left)) left++;
+        while (right >= left && colAllZero(grid, right)) right--;
+
+        if (top > bottom || left > right) {
+            return new int[][]{{0}};
+        }
+
+        int newRows = bottom - top + 1;
+        int newCols = right - left + 1;
+        int[][] trimmed = new int[newRows][newCols];
+        for (int r = 0; r < newRows; r++) {
+            for (int c = 0; c < newCols; c++) {
+                trimmed[r][c] = grid[top + r][left + c];
+            }
+        }
+        return trimmed;
+    }
+
+    private boolean rowAllZero(int[][] grid, int row) {
+        for (int c = 0; c < grid[row].length; c++) {
+            if (grid[row][c] != 0) return false;
+        }
+        return true;
+    }
+
+    private boolean colAllZero(int[][] grid, int col) {
+        for (int r = 0; r < grid.length; r++) {
+            if (grid[r][col] != 0) return false;
+        }
+        return true;
+    }
+
     public int calculateDiffCount(int[][] expected, int[][] actual) {
         if (expected.length != actual.length || expected[0].length != actual[0].length) {
             return Integer.MAX_VALUE;
