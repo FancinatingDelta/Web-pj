@@ -48,7 +48,11 @@
     <div class="step-nav">
       <button type="button" [disabled]="currentStep <= 1" (click)="prevStep()">上一步</button>
       <span class="step-info">{{ currentStep }} / 3</span>
-      <button type="button" [disabled]="currentStep >= 3" (click)="nextStep()">下一步</button>
+      @if (currentStep >= 3) {
+        <button type="button" class="btn-finish" (click)="finish()">完成</button>
+      } @else {
+        <button type="button" (click)="nextStep()">下一步</button>
+      }
     </div>
   }
 </section>

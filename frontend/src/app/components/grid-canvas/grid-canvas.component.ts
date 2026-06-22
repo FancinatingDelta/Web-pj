@@ -18,17 +18,16 @@ export class GridCanvasComponent {
   @Output() cellSelected = new EventEmitter<{ row: number; col: number } | null>();
 
   onCellClick(row: number, col: number): void {
+    if (this.editMode) {
+      this.cellToggle.emit({ row, col });
+      return;
+    }
+    // observe mode: select / deselect, no toggle
     if (this.selectedCell?.row === row && this.selectedCell?.col === col) {
       this.cellSelected.emit(null);
-      if (this.editMode) {
-        this.cellToggle.emit({ row, col });
-      }
       return;
     }
     this.cellSelected.emit({ row, col });
-    if (this.editMode) {
-      this.cellToggle.emit({ row, col });
-    }
   }
 
   isNeighborCell(row: number, col: number): boolean {

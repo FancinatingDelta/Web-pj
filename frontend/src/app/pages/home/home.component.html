@@ -1,0 +1,54 @@
+<div class="home-shell">
+  @if (username) {
+    <div class="home-user-area">
+      <span class="home-avatar">{{ username.charAt(0).toUpperCase() }}</span>
+      <span class="home-username">{{ username }}</span>
+      <button class="home-logout-btn" (click)="logout()">退出登录</button>
+    </div>
+  } @else {
+    <a class="home-login-link" routerLink="/login">登录 / 注册</a>
+  }
+  <div class="home-content">
+    <!-- Glider visual -->
+    <div class="glider-display">
+      <div class="glider-grid">
+        @for (row of grid; track $index) {
+          <div class="glider-row">
+            @for (cell of row; track $index) {
+              <span class="glider-cell" [class.alive]="cell === 1"></span>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="home-title">元胞自动机仿真平台</h1>
+    <p class="home-subtitle">
+      探索康威生命游戏、Rule 30、Rule 110 等经典元胞自动机<br/>
+      可视化建模 · 交互仿真 · 学习评测
+    </p>
+
+    <!-- Buttons -->
+    <div class="home-actions">
+      <a class="home-btn home-btn-primary" routerLink="/simulator">
+        <span class="btn-icon">&#x1F3AE;</span>
+        <span class="btn-body">
+          <span class="btn-label">Solo 模式</span>
+          <span class="btn-desc">独立实验与学习</span>
+        </span>
+      </a>
+      <button class="home-btn home-btn-secondary" disabled>
+        <span class="btn-icon">&#x1F91D;</span>
+        <span class="btn-body">
+          <span class="btn-label">协作模式</span>
+          <span class="btn-desc">多人实时演示 · 即将推出</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <footer class="home-footer">
+    <span>Conway's Game of Life · Stephen Wolfram's Rule 30 &amp; 110</span>
+  </footer>
+</div>

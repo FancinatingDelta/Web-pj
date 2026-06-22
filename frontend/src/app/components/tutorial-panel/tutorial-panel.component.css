@@ -181,6 +181,14 @@ h3 {
   cursor: not-allowed;
 }
 
+.btn-finish {
+  background: #10b981 !important;
+}
+
+.btn-finish:hover {
+  background: #059669 !important;
+}
+
 .step-info {
   font-size: 12px;
   color: #6b7280;

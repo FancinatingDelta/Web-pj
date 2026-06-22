@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { NeighborhoodType } from '../../models/simulation.model';
 
 @Component({
@@ -7,6 +7,7 @@ import { NeighborhoodType } from '../../models/simulation.model';
   styleUrl: './tutorial-panel.component.css'
 })
 export class TutorialPanelComponent implements OnChanges {
+  @Output() finishTutorial = new EventEmitter<void>();
   @Input() grid: number[][] = [];
   @Input() selectedCell: { row: number; col: number } | null = null;
   @Input() neighborhoodType: NeighborhoodType = 'MOORE';
@@ -98,10 +99,19 @@ export class TutorialPanelComponent implements OnChanges {
   }
 
   nextStep(): void {
-    if (this.currentStep < 3) this.currentStep++;
+    if (this.currentStep < 3) {
+      this.currentStep++;
+    } else {
+      this.finish();
+    }
   }
 
   prevStep(): void {
     if (this.currentStep > 1) this.currentStep--;
+  }
+
+  finish(): void {
+    this.currentStep = 0;
+    this.finishTutorial.emit();
   }
 }

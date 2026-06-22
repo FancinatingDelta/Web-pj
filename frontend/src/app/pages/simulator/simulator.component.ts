@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subscription, interval, switchMap } from 'rxjs';
-import { ControlPanelComponent } from '../../components/control-panel/control-panel.component';
 import { GridCanvasComponent } from '../../components/grid-canvas/grid-canvas.component';
 import { GridConfigComponent } from '../../components/grid-config/grid-config.component';
 import { RuleEditorComponent } from '../../components/rule-editor/rule-editor.component';
@@ -23,16 +22,25 @@ import { SimulationApiService } from '../../services/simulation-api.service';
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     GridCanvasComponent,
     GridConfigComponent,
     RuleEditorComponent,
-    ControlPanelComponent,
     TutorialPanelComponent
   ],
   templateUrl: './simulator.component.html',
   styleUrl: './simulator.component.css'
 })
 export class SimulatorComponent implements OnInit, OnDestroy {
+  /* ---- tab & accordion ---- */
+  activeTab: 'simulation' | 'evaluation' | 'presets' = 'simulation';
+  accordionState: Record<string, boolean> = {
+    ruleConfig: true,
+    simControls: true,
+    initStorage: false
+  };
+
+  /* ---- simulation state ---- */
   ruleConfig: RuleConfig = {
     automataType: 'LIFE_GAME_2D',
     neighborhoodType: 'MOORE',
@@ -55,18 +63,42 @@ export class SimulatorComponent implements OnInit, OnDestroy {
   username: string | null = null;
 
   presets: PresetModel[] = [];
+  private readonly categoryOrder = ['生灵', '振荡器', '飞船', '繁衍器', '集合', '创造', '射线', '电路', '1D 经典'];
+
+  get presetsByCategory(): { category: string; presets: PresetModel[] }[] {
+    const map = new Map<string, PresetModel[]>();
+    for (const p of this.presets) {
+      const cat = p.category || '其他';
+      if (!map.has(cat)) map.set(cat, []);
+      map.get(cat)!.push(p);
+    }
+    const result: { category: string; presets: PresetModel[] }[] = [];
+    for (const cat of this.categoryOrder) {
+      if (map.has(cat)) result.push({ category: cat, presets: map.get(cat)! });
+    }
+    for (const cat of map.keys()) {
+      if (!this.categoryOrder.includes(cat)) result.push({ category: cat, presets: map.get(cat)! });
+    }
+    return result;
+  }
+
   scenarios: EvaluationScenario[] = [];
   selectedScenarioId = '';
+  loadedScenarioId: string | null = null;
   evaluationResult: EvaluationResult | null = null;
   savedRecords: RecordSummary[] = [];
 
+  /* ---- misc ---- */
+  saveName = '';
+  pendingJumpGeneration: number | null = null;
   private runnerSub: Subscription | null = null;
 
   constructor(
     private readonly api: SimulationApiService,
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly storage: StorageService
+    private readonly storage: StorageService,
+    private readonly el: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -84,9 +116,62 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     this.stopAutoRun();
   }
 
+  /* ---- computed ---- */
+
   get historyCount(): number {
     return this.history.length;
   }
+
+  get historyIndices(): number[] {
+    return Array.from({ length: this.history.length }, (_, i) => i);
+  }
+
+  get isGridEditable(): boolean {
+    return this.activeTab === 'simulation' && this.editMode;
+  }
+
+  get displayProbability(): number {
+    return Math.round(this.ruleConfig.probability * 100);
+  }
+
+  get previewGrid(): number[][] | null {
+    if (this.pendingJumpGeneration === null) return null;
+    return this.history[this.pendingJumpGeneration] ?? null;
+  }
+
+  get previewGridCols(): number {
+    return this.previewGrid && this.previewGrid[0] ? this.previewGrid[0].length : 0;
+  }
+
+  /* ---- tab & accordion ---- */
+
+  switchTab(tab: 'simulation' | 'evaluation' | 'presets'): void {
+    this.activeTab = tab;
+    this.evaluationResult = null;
+  }
+
+  toggleAccordion(section: string): void {
+    this.accordionState[section] = !this.accordionState[section];
+  }
+
+  /* ---- file & save helpers ---- */
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.importFromJSON(input.files[0]);
+      input.value = '';
+    }
+  }
+
+  onSaveClick(): void {
+    const name = this.saveName.trim();
+    if (!name) return;
+    this.saveToLibrary(name);
+    this.saveName = '';
+  }
+
+  /* ---- rule & grid ---- */
 
   onRuleChange(nextConfig: RuleConfig): void {
     this.ruleConfig = nextConfig;
@@ -176,14 +261,33 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     this.saveDraftAsync();
   }
 
-  jumpToHistory(targetGen: number): void {
+  selectHistoryGen(targetGen: number): void {
     if (targetGen < 0 || targetGen >= this.history.length) return;
+    this.pendingJumpGeneration = targetGen;
+  }
+
+  confirmJump(): void {
+    if (this.pendingJumpGeneration === null) return;
+    const target = this.pendingJumpGeneration;
+    this.pendingJumpGeneration = null;
     this.stopAutoRun();
-    this.grid = this.cloneGrid(this.history[targetGen]);
-    this.history = this.history.slice(0, targetGen);
-    this.generation = targetGen;
+    this.grid = this.cloneGrid(this.history[target]);
+    this.history = this.history.slice(0, target);
+    this.generation = target;
     this.changedCount = 0;
     this.saveDraftAsync();
+  }
+
+  cancelJump(): void {
+    this.pendingJumpGeneration = null;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.pendingJumpGeneration === null) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('.history-timeline') || target.closest('.jump-actions')) return;
+    this.cancelJump();
   }
 
   resetFromInitial(): void {
@@ -199,6 +303,8 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     }
     this.ruleConfig = { ...preset.ruleConfig };
     this.grid = this.cloneGrid(preset.initialGrid);
+    this.gridRows = this.grid.length;
+    this.gridCols = this.grid[0].length;
     this.resetEvolutionStats();
   }
 
@@ -207,19 +313,34 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     if (!scenario) {
       return;
     }
+    this.loadedScenarioId = scenario.id;
     this.ruleConfig = { ...scenario.ruleConfig };
     this.grid = this.cloneGrid(scenario.initialGrid);
+    this.gridRows = this.grid.length;
+    this.gridCols = this.grid[0].length;
     this.resetEvolutionStats();
     this.evaluationResult = null;
   }
 
   checkCurrentScenario(): void {
-    if (!this.selectedScenarioId) {
+    if (!this.loadedScenarioId) {
       return;
     }
-    this.api.checkScenario(this.selectedScenarioId, this.grid).subscribe((result) => {
+    this.api.checkScenario(this.loadedScenarioId, this.grid).subscribe((result) => {
       this.evaluationResult = result;
     });
+  }
+
+  resetToScenario(): void {
+    const scenario = this.scenarios.find((item) => item.id === this.loadedScenarioId);
+    if (!scenario) return;
+    this.grid = this.cloneGrid(scenario.initialGrid);
+    this.gridRows = this.grid.length;
+    this.gridCols = this.grid[0].length;
+    this.history = [];
+    this.generation = 0;
+    this.changedCount = 0;
+    this.evaluationResult = null;
   }
 
   exportGrid(): void {
@@ -249,6 +370,8 @@ export class SimulatorComponent implements OnInit, OnDestroy {
         }
         this.ruleConfig = data.ruleConfig;
         this.grid = data.grid;
+        this.gridRows = this.grid.length;
+        this.gridCols = this.grid[0].length;
         this.resetEvolutionStats();
         this.generation = data.generation ?? 0;
         this.selectedCell = null;
@@ -285,6 +408,26 @@ export class SimulatorComponent implements OnInit, OnDestroy {
 
   deleteRecordFromLibrary(id: number): void {
     this.storage.deleteRecord(id).then(() => this.loadRecordList());
+  }
+
+  get loadedScenario(): EvaluationScenario | undefined {
+    return this.scenarios.find(s => s.id === this.loadedScenarioId);
+  }
+
+  get loadedScenarioSteps(): number {
+    return this.loadedScenario?.steps ?? 0;
+  }
+
+  get isScenarioLoaded(): boolean {
+    return this.loadedScenarioId !== null;
+  }
+
+  getScenarioTitle(id: string): string {
+    return this.scenarios.find(s => s.id === id)?.title ?? '';
+  }
+
+  getScenarioQuestion(id: string): string {
+    return this.scenarios.find(s => s.id === id)?.question ?? '';
   }
 
   logout(): void {
