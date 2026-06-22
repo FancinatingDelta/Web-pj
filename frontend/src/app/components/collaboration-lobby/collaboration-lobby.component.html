@@ -1,0 +1,54 @@
+<div class="lobby">
+  <h2 class="lobby-title">协作学习大厅</h2>
+
+  @if (!connected) {
+    <p class="lobby-hint">正在连接服务器...</p>
+  } @else {
+    <div class="lobby-section">
+      <h3>创建房间</h3>
+      <div class="lobby-row">
+        <input
+          type="text"
+          [(ngModel)]="newRoomName"
+          placeholder="输入房间名称"
+          maxlength="30"
+          (keyup.enter)="onCreate()" />
+        <button class="btn-primary" (click)="onCreate()">创建</button>
+      </div>
+    </div>
+
+    <div class="lobby-section">
+      <h3>加入房间</h3>
+      <div class="lobby-row">
+        <input
+          type="text"
+          [(ngModel)]="joinRoomId"
+          placeholder="输入房间 ID"
+          maxlength="30"
+          (keyup.enter)="onJoin()" />
+        <button class="btn-secondary" (click)="onJoin()">加入</button>
+      </div>
+    </div>
+
+    <div class="lobby-section">
+      <h3>公开房间</h3>
+      @if (rooms.length === 0) {
+        <p class="lobby-hint">暂无房间，创建一个吧</p>
+      } @else {
+        <div class="room-list">
+          @for (room of rooms; track room.roomId) {
+            <div class="room-card" (click)="joinRequest.emit(room.roomId)">
+              <div class="room-card-info">
+                <span class="room-name">{{ room.roomName }}</span>
+                <span class="room-meta">
+                  {{ room.userCount }} 人在线 · ID: {{ room.roomId }}
+                </span>
+              </div>
+              <button class="btn-ghost btn-sm">加入</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

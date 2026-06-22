@@ -1,0 +1,137 @@
+<!-- ===== Header ===== -->
+<header class="top-bar">
+  <a class="top-bar-left" routerLink="/">
+    <span class="logo-icon">&#x2B21;</span>
+    <span class="logo-text">元胞自动机仿真平台</span>
+  </a>
+
+  <div class="top-bar-center">
+    <span class="page-label">协作学习</span>
+  </div>
+
+  <div class="top-bar-right">
+    @if (roomState) {
+      <span class="room-badge">{{ roomState.roomName }}</span>
+      <button class="btn-leave" (click)="leaveCurrentRoom()">离开房间</button>
+    }
+    @if (username) {
+      <div class="user-badge">
+        <span class="user-avatar">{{ username.charAt(0).toUpperCase() }}</span>
+        <span class="user-name">{{ username }}</span>
+      </div>
+    }
+  </div>
+</header>
+
+<!-- ===== Lobby View ===== -->
+@if (!roomState) {
+  <app-collaboration-lobby
+    [rooms]="rooms"
+    [connected]="connected"
+    (createRequest)="onCreateRoom($event)"
+    (joinRequest)="onJoinRoom($event)" />
+}
+
+<!-- ===== Room View ===== -->
+@if (roomState) {
+  <div class="main-content">
+    <!-- Left sidebar -->
+    <aside class="sidebar-left">
+      <section class="accordion">
+        <div class="accordion-header-static">
+          <h3>规则配置</h3>
+        </div>
+        <div class="accordion-body">
+          <app-rule-editor
+            [ruleConfig]="roomState.ruleConfig"
+            (ruleConfigChange)="onRuleChange($event)" />
+        </div>
+      </section>
+
+      <section class="accordion">
+        <div class="accordion-header-static">
+          <h3>仿真控制</h3>
+        </div>
+        <div class="accordion-body">
+          <div class="control-buttons">
+            <button class="btn-secondary" (click)="runSingleStep()">
+              &#x23EE; 单步
+            </button>
+            <button class="btn-primary" (click)="toggleAutoRun()">
+              {{ isRunning ? '&#x23F8; 暂停' : '&#x25B6; 连续演化' }}
+            </button>
+          </div>
+
+          <div class="control-meta">
+            <label class="speed-label">
+              速度 <span class="speed-value">{{ speedMs }}ms</span>
+              <input type="range" min="80" max="1200" step="20"
+                [ngModel]="speedMs"
+                (ngModelChange)="onSpeedChange($event)" />
+            </label>
+            <div class="generation-display">
+              <span class="gen-number">{{ roomState.generation }}</span>
+              <span class="gen-unit">代</span>
+            </div>
+          </div>
+
+          <div class="section-divider"></div>
+
+          <div class="control-buttons">
+            <button class="btn-secondary" (click)="randomizeGrid()">&#x1F3B2; 随机生成</button>
+            <button class="btn-secondary" (click)="clearGrid()">&#x1F5D1; 清空画布</button>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Center: grid canvas -->
+    <main class="content-center">
+      <div class="rule-banner">
+        @if (roomState.ruleConfig.automataType === 'LIFE_GAME_2D') {
+          <span class="rule-tag rule-tag-main">生命游戏 2D</span>
+          <span class="rule-tag">{{ roomState.ruleConfig.neighborhoodType === 'MOORE' ? 'Moore 邻域 (8邻居)' : 'von Neumann 邻域 (4邻居)' }}</span>
+          <span class="rule-tag">存活 B{{ roomState.ruleConfig.surviveMin }}-{{ roomState.ruleConfig.surviveMax }}</span>
+          <span class="rule-tag">复活 S{{ roomState.ruleConfig.birthValue }}</span>
+        } @else {
+          <span class="rule-tag rule-tag-main">{{ roomState.ruleConfig.automataType === 'RULE_30_1D' ? 'Rule 30' : 'Rule 110' }}</span>
+          <span class="rule-tag">一维元胞自动机</span>
+          <span class="rule-tag">规则号 {{ roomState.ruleConfig.ruleNumber }}</span>
+        }
+        @if (roomState.ruleConfig.probability < 1) {
+          <span class="rule-tag rule-tag-prob">概率 {{ displayProbability }}%</span>
+        }
+      </div>
+
+      <app-grid-canvas
+        [grid]="roomState.grid"
+        [editMode]="true"
+        [neighborhoodType]="roomState.ruleConfig.neighborhoodType"
+        (cellToggle)="toggleCell($event)" />
+
+      <div class="status-bar">
+        <span class="status-label">第 <strong>{{ roomState.generation }}</strong> 代</span>
+        <span class="status-divider">|</span>
+        <span class="status-label">本轮变化 <strong>{{ roomState.changedCount }}</strong> 个细胞</span>
+      </div>
+
+      <section class="panel" style="margin-top: 12px; width: 100%;">
+        <h4 class="panel-title">网格尺寸</h4>
+        <app-grid-config
+          [rows]="roomState.grid.length"
+          [cols]="roomState.grid[0].length"
+          [is2D]="is2D"
+          (confirmed)="onGridConfirm($event)" />
+      </section>
+    </main>
+
+    <!-- Right sidebar: chat -->
+    <aside class="sidebar-right">
+      <app-collaboration-chat
+        [messages]="chatMessages"
+        [users]="roomState.users"
+        [username]="username ?? ''"
+        (sendMessage)="onSendChat($event)" />
+    </aside>
+  </div>
+}

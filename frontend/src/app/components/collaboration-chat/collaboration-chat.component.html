@@ -1,0 +1,39 @@
+<div class="chat-panel">
+  <div class="members-section">
+    <h4 class="section-title">房间成员 ({{ users.length }})</h4>
+    <ul class="member-list">
+      @for (user of users; track user) {
+        <li class="member-item" [class.isSelf]="user === username">
+          <span class="member-avatar">{{ user.charAt(0).toUpperCase() }}</span>
+          <span class="member-name">{{ user }}</span>
+        </li>
+      }
+    </ul>
+  </div>
+
+  <div class="messages-section">
+    <h4 class="section-title">消息</h4>
+    <div class="messages-scroll" #chatScroll>
+      @for (msg of messages; track msg.timestamp) {
+        <div class="chat-msg" [class.isSelf]="msg.username === username">
+          @if (msg.username !== username) {
+            <span class="msg-sender">{{ msg.username }}</span>
+          }
+          <div class="msg-bubble">
+            {{ msg.content }}
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="chat-input-row">
+      <input
+        type="text"
+        [(ngModel)]="newMessage"
+        placeholder="输入消息..."
+        maxlength="500"
+        (keyup.enter)="onSend()" />
+      <button class="btn-primary btn-sm" (click)="onSend()">发送</button>
+    </div>
+  </div>
+</div>
