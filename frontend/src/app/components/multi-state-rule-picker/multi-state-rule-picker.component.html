@@ -1,0 +1,58 @@
+<div class="rule-picker">
+  <h3 class="section-title">规则选择</h3>
+
+  <div class="rule-list">
+    @for (rule of rules; track rule.ruleName) {
+      <button
+        type="button"
+        class="rule-card"
+        [class.active]="config.ruleName === rule.ruleName"
+        (click)="onRuleSelect(rule.ruleName)">
+        <span class="rule-label">{{ rule.label }}</span>
+        <span class="rule-desc">{{ rule.description }}</span>
+      </button>
+    }
+  </div>
+
+  <div class="params">
+    @if (config.ruleName === 'cyclic_ca' || config.ruleName === 'generations') {
+      <label class="param">
+        <span>状态数: {{ config.numStates }}</span>
+        <input type="range" min="2" max="5" [ngModel]="config.numStates"
+               (input)="onNumStatesChange(+$any($event.target).value)" />
+      </label>
+    }
+
+    @if (config.ruleName === 'cyclic_ca') {
+      <label class="param">
+        <span>阈值: {{ config.threshold }}</span>
+        <input type="range" min="1" max="8" [ngModel]="config.threshold"
+               (input)="onThresholdChange(+$any($event.target).value)" />
+      </label>
+    }
+
+    @if (config.ruleName === 'generations') {
+      <label class="param">
+        <span>出生值: {{ config.birthValue }}</span>
+        <input type="range" min="1" max="8" [ngModel]="config.birthValue"
+               (input)="onBirthValueChange(+$any($event.target).value)" />
+      </label>
+    }
+
+    @if (!is1D()) {
+      <label class="param">
+        <span>邻域类型</span>
+        <select [ngModel]="config.neighborhoodType" (ngModelChange)="onNeighborhoodChange($event)">
+          <option value="MOORE">Moore (8邻域)</option>
+          <option value="VON_NEUMANN">von Neumann (4邻域)</option>
+        </select>
+      </label>
+    }
+
+    <label class="param">
+      <span>概率: {{ (config.probability * 100) | number:'1.0-0' }}%</span>
+      <input type="range" min="0" max="100" [ngModel]="config.probability * 100"
+             (input)="onProbabilityChange(+$any($event.target).value / 100)" />
+    </label>
+  </div>
+</div>

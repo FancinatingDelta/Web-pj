@@ -24,4 +24,12 @@ export const routes: Routes = [
     component: CollaborationComponent,
     canActivate: [authGuard],
   },
+  {
+    path: 'multi-state',
+    loadComponent: () =>
+      import('./pages/multi-state-simulator/multi-state-simulator.component').then(
+        (m) => m.MultiStateSimulatorComponent,
+      ),
+    canActivate: [authGuard],
+  },
 ];

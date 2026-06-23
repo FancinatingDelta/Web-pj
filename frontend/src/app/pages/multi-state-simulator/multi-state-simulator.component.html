@@ -1,0 +1,115 @@
+<div class="sim-shell">
+  <header class="sim-header">
+    <a class="back-link" routerLink="/">← 返回首页</a>
+    <h1 class="sim-title">多状态元胞自动机</h1>
+    <span class="sim-subtitle">Multi-State Cellular Automaton</span>
+  </header>
+
+  <div class="sim-body">
+    <!-- Left: rule picker + legend -->
+    <aside class="sim-left">
+      <app-multi-state-legend
+        [ruleName]="config.ruleName"
+        [numStates]="config.numStates">
+      </app-multi-state-legend>
+
+      <app-multi-state-rule-picker
+        [config]="config"
+        (configChange)="onConfigChange($event)">
+      </app-multi-state-rule-picker>
+
+      @if (!is1D) {
+        <div class="grid-size-panel">
+          <h3 class="section-title">网格大小</h3>
+          <div class="size-controls">
+            <label class="size-label">
+              行: {{ gridRows }}
+              <input type="range" min="1" max="100" [ngModel]="gridRows"
+                     (input)="onResize(+$any($event.target).value, gridCols)" />
+            </label>
+            <label class="size-label">
+              列: {{ gridCols }}
+              <input type="range" min="1" max="100" [ngModel]="gridCols"
+                     (input)="onResize(gridRows, +$any($event.target).value)" />
+            </label>
+          </div>
+        </div>
+      } @else {
+        <div class="grid-size-panel">
+          <h3 class="section-title">网格大小</h3>
+          <div class="size-controls">
+            <label class="size-label">
+              列: {{ gridCols }}
+              <input type="range" min="3" max="200" [ngModel]="gridCols"
+                     (input)="onResize(1, +$any($event.target).value)" />
+            </label>
+          </div>
+        </div>
+      }
+    </aside>
+
+    <!-- Center: grid -->
+    <main class="sim-center">
+      <app-multi-state-grid
+        [grid]="grid"
+        [editMode]="editMode"
+        [selectedCell]="selectedCell"
+        [numStates]="config.numStates"
+        [neighborhoodType]="config.neighborhoodType"
+        (cellToggle)="onCellToggle($event)"
+        (cellSelected)="onCellSelect($event)">
+      </app-multi-state-grid>
+
+      <div class="status-bar">
+        <span>代: {{ generation }}</span>
+        <span>变更: {{ changedCount }}</span>
+        @if (!isRunning) {
+          <span class="status-paused">已暂停</span>
+        } @else {
+          <span class="status-running">运行中</span>
+        }
+      </div>
+    </main>
+
+    <!-- Right: controls -->
+    <aside class="sim-right">
+      <div class="control-panel">
+        <h3 class="section-title">控制</h3>
+        <div class="ctrl-buttons">
+          <button class="ctrl-btn primary" (click)="stepOnce()" [disabled]="isRunning">
+            ▶ 单步
+          </button>
+          <button class="ctrl-btn" [class.running]="isRunning" (click)="toggleAuto()">
+            {{ isRunning ? '⏸ 停止' : '⏵ 自动运行' }}
+          </button>
+          <button class="ctrl-btn" (click)="randomize()">🎲 随机化</button>
+          <button class="ctrl-btn" (click)="clear()">🗑 清空</button>
+        </div>
+
+        <label class="speed-label">
+          <span>速度: {{ speedMs }}ms</span>
+          <input type="range" min="80" max="1200" step="20" [ngModel]="speedMs"
+                 (input)="onSpeedChange(+$any($event.target).value)" />
+        </label>
+
+        <label class="edit-toggle">
+          <input type="checkbox" [ngModel]="editMode" />
+          <span>编辑模式</span>
+        </label>
+
+        @if (history.length > 0) {
+          <div class="history-section">
+            <span class="history-title">历史 ({{ history.length }} 步)</span>
+            <div class="history-list">
+              @for (gen of [].constructor(history.length); track $index; let i = $index) {
+                <button class="history-btn" (click)="jumpToGeneration(i)">
+                  第 {{ i }} 代
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </aside>
+  </div>
+</div>
