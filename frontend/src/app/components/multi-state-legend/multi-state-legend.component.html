@@ -1,0 +1,9 @@
+<div class="legend">
+  <span class="legend-title">图例</span>
+  @for (entry of entries; track entry.state) {
+    <div class="legend-item">
+      <span class="legend-swatch" [style.background]="entry.color"></span>
+      <span class="legend-label">{{ entry.label }}</span>
+    </div>
+  }
+</div>

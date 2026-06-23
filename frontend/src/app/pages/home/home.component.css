@@ -199,6 +199,17 @@
   background: #f9fafb;
 }
 
+.home-btn-accent {
+  background: #f97316;
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+}
+
+.home-btn-accent:hover {
+  background: #ea580c;
+  box-shadow: 0 8px 30px rgba(249, 115, 22, 0.4);
+}
+
 .home-btn .btn-icon {
   font-size: 28px;
   flex-shrink: 0;

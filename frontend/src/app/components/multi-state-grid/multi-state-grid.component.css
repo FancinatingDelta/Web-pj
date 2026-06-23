@@ -1,0 +1,33 @@
+.grid-board {
+  display: inline-block;
+  padding: 12px;
+  background: #111827;
+  border-radius: 10px;
+}
+
+.grid-row {
+  display: flex;
+}
+
+.cell {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #1f2937;
+  margin: 1px;
+  cursor: pointer;
+}
+
+.cell.state-0 { background: #e5e7eb; }
+.cell.state-1 { background: #22c55e; }
+.cell.state-2 { background: #3b82f6; }
+.cell.state-3 { background: #ef4444; }
+.cell.state-4 { background: #eab308; }
+
+.cell.selected {
+  box-shadow: 0 0 0 2px #f59e0b inset;
+}
+
+.cell.neighbor {
+  opacity: 0.7;
+  box-shadow: 0 0 0 2px #f59e0b inset;
+}
