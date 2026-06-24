@@ -10,6 +10,7 @@
   </div>
 
   <div class="top-bar-right">
+    <a class="btn-back-home" routerLink="/">&#x2190; 返回首页</a>
     @if (roomState) {
       <span class="room-badge">{{ roomState.roomName }}</span>
       <button class="btn-leave" (click)="leaveCurrentRoom()">离开房间</button>

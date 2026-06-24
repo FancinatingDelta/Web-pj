@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-login',
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
 export class LoginComponent {
   mode: 'login' | 'register' = 'login';
@@ -20,7 +20,7 @@ export class LoginComponent {
 
   constructor(
     private readonly authService: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
   ) {}
 
   switchMode(mode: 'login' | 'register'): void {
@@ -42,16 +42,15 @@ export class LoginComponent {
     this.loading = true;
     const request = { username: this.username.trim(), password: this.password };
 
-    const action = this.mode === 'login'
-      ? this.authService.login(request)
-      : this.authService.register(request);
+    const action =
+      this.mode === 'login' ? this.authService.login(request) : this.authService.register(request);
 
     action.subscribe({
       next: (res) => {
         this.loading = false;
         if (res.success) {
           this.authService.setCurrentUser(res.username!);
-          this.router.navigate(['/simulator']);
+          this.router.navigate(['/']);
         } else {
           this.errorMessage = res.message;
         }
@@ -59,7 +58,7 @@ export class LoginComponent {
       error: () => {
         this.loading = false;
         this.errorMessage = '网络错误，请确认后端已启动';
-      }
+      },
     });
   }
 }

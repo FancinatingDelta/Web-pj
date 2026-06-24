@@ -13,3 +13,9 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.pj.domain
+
+logging:
+  level:
+    com.pj: DEBUG
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG

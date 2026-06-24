@@ -81,6 +81,20 @@
   font-weight: 500;
 }
 
+.btn-back-home {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s, background 0.15s;
+}
+
+.btn-back-home:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .btn-leave {
   background: rgba(239, 68, 68, 0.15);
   color: #fca5a5;

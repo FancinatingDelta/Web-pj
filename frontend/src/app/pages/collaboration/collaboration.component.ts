@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -45,6 +46,7 @@ export class CollaborationComponent implements OnInit, OnDestroy {
     private readonly collab: CollaborationService,
     private readonly authService: AuthService,
     private readonly router: Router,
+    private readonly http: HttpClient,
   ) {}
 
   ngOnInit(): void {
@@ -55,6 +57,7 @@ export class CollaborationComponent implements OnInit, OnDestroy {
     }
 
     this.collab.connect();
+    this.loadRooms();
 
     this.subscriptions.push(
       this.collab.connected$.subscribe((c) => (this.connected = c)),
@@ -66,6 +69,15 @@ export class CollaborationComponent implements OnInit, OnDestroy {
     );
   }
 
+  private loadRooms(): void {
+    this.http.get<RoomInfo[]>('/api/rooms').subscribe({
+      next: (rooms) => (this.rooms = rooms),
+      error: () => {
+        /* ignore; WebSocket will update the list */
+      },
+    });
+  }
+
   ngOnDestroy(): void {
     this.stopAutoRun();
     this.subscriptions.forEach((s) => s.unsubscribe());
@@ -74,7 +86,7 @@ export class CollaborationComponent implements OnInit, OnDestroy {
 
   onCreateRoom(roomName: string): void {
     if (!this.username) return;
-    const roomId = crypto.randomUUID().substring(0, 8);
+    const roomId = Math.random().toString(36).substring(2, 10);
     this.collab.createRoom(roomId, roomName, this.username);
   }
 
